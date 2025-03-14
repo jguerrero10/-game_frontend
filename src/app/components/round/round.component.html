@@ -1,0 +1,21 @@
+<h3>Ronda {{ roundNumber }}</h3>
+
+<div>
+  <p>Jugador 1: {{ player1 }}</p>
+  <label for="player1Move">Movimiento:</label>
+  <select id="player1Move" (change)="setPlayer1Move($event)">
+    <option *ngFor="let move of moves" [value]="move">{{ move }}</option>
+  </select>
+</div>
+
+<div>
+  <p>Jugador 2: {{ player2 }}</p>
+  <label for="player2Move">Movimiento:</label>
+  <select id="player2Move" (change)="setPlayer2Move($event)">
+    <option *ngFor="let move of moves" [value]="move">{{ move }}</option>
+  </select>
+</div>
+
+<div *ngIf="winner">
+  <h4>Resultado de la Ronda: {{ winner }}</h4>
+</div>

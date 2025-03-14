@@ -1,0 +1,51 @@
+<h1>Piedra, Papel o Tijera Games</h1>
+
+<!-- Registro de Jugadores -->
+<h2>Registro de Jugadores</h2>
+<form [formGroup]="playersForm" (ngSubmit)="registerPlayers()">
+  <label>Jugador 1</label>
+  <input formControlName="player1" placeholder="Nombre Completo">
+
+  <label>Jugador 2</label>
+  <input formControlName="player2" placeholder="Nombre Completo">
+
+  <button type="submit" [disabled]="playersForm.invalid">Iniciar Batalla</button>
+</form>
+
+<!-- Rondas del Juego -->
+<div *ngIf="gameStarted">
+  <h2>Rondas</h2>
+  
+  <div *ngFor="let round of rounds; let i = index">
+    <h3>Ronda {{ i + 1 }}</h3>
+
+    <div>
+      <p>Jugador 1: {{ player1 }}</p>
+      <label for="player1Move{{i}}">Movimiento:</label>
+      <select id="player1Move{{i}}" (change)="setPlayer1Move($event, i)">
+        <option *ngFor="let move of moves" [value]="move">{{ move }}</option>
+      </select>
+    </div>
+
+    <div>
+      <p>Jugador 2: {{ player2 }}</p>
+      <label for="player2Move{{i}}">Movimiento:</label>
+      <select id="player2Move{{i}}" (change)="setPlayer2Move($event, i)" [disabled]="!round.player1Move">
+        <option *ngFor="let move of moves" [value]="move">{{ move }}</option>
+      </select>
+    </div>
+
+    <!-- Resultado parcial -->
+    <div *ngIf="round.winner">
+      <h4>Resultado de la Ronda: {{ round.winner }}</h4>
+    </div>
+  </div>
+
+  <!-- Resultado Final -->
+  <div *ngIf="finalWinner">
+    <h2>¡Tenemos un Ganador!</h2>
+    <p>El ganador es: {{ finalWinner }}</p>
+
+    <button (click)="restartGame()">Nuevo Juego</button>
+  </div>
+</div>
