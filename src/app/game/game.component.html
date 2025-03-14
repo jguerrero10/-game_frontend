@@ -61,7 +61,7 @@
         <!-- Resultado Final -->
         <div *ngIf="finalWinner" class="alert alert-success mt-4 text-center">
             <h2 class="fw-bold">🎯 ¡Tenemos un Ganador! 🎯</h2>
-            <p class="fw-bold">🏆 El ganador es: {{ finalWinner }}</p>
+            <p class="fw-bold">🏆 {{ finalWinner }}</p>
 
             <button (click)="restartGame()" class="btn btn-primary">🔄 Reiniciar Juego</button>
             <button (click)="newGame()" class="btn btn-warning">🆕 Nuevo Juego</button>

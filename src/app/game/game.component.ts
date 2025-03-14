@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
-import { CommonModule} from '@angular/common'; 
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common'; 
 import { FormsModule } from '@angular/forms';
 import { GameService } from '../services/game.service';
 
@@ -15,7 +15,7 @@ export class GameComponent {
   playersForm: FormGroup;
   gameStarted = false;
   gameId: number | null = null;
-  rounds: any[] = [];
+  rounds: any[] = [{ player1Move: null, player2Move: null, winner: null }];
   finalWinner: string | null = null;
   isLoading = false;
   moves = [
@@ -53,11 +53,7 @@ export class GameComponent {
                 next: (gameResponse) => {
                   this.gameId = gameResponse.id;
                   this.gameStarted = true;
-                  this.rounds = [
-                    { player1Move: null, player2Move: null, winner: null },
-                    { player1Move: null, player2Move: null, winner: null },
-                    { player1Move: null, player2Move: null, winner: null }
-                  ];
+                  this.rounds = [{ player1Move: null, player2Move: null, winner: null }];
                 },
                 error: (err) => console.error('❌ Error al crear el juego:', err)
               });
@@ -72,10 +68,12 @@ export class GameComponent {
     }
   }
 
+  // 👉 Establecer movimiento del jugador 1
   setPlayer1Move(index: number) {
     this.checkRoundResult(index);
   }
 
+  // 👉 Establecer movimiento del jugador 2
   setPlayer2Move(index: number) {
     if (!this.rounds[index].player1Move) {
       alert('⚠️ El Jugador 1 debe elegir su movimiento primero.');
@@ -97,15 +95,12 @@ export class GameComponent {
         player2Move: round.player2Move
       }).subscribe({
         next: (response: any) => {
-          this.rounds[index].winner = response.winner_name;
-
-          const player1Wins = this.rounds.filter(r => r.winner === this.player1).length;
-          const player2Wins = this.rounds.filter(r => r.winner === this.player2).length;
-
-          if (player1Wins === 3) {
-            this.finalWinner = this.player1;
-          } else if (player2Wins === 3) {
-            this.finalWinner = this.player2;
+          if (response.message) {
+            // El backend indicó que el juego terminó
+            this.finalWinner = response.message;
+          } else {
+            // El juego aún no ha terminado, agregar nueva ronda
+            this.rounds.push({ player1Move: null, player2Move: null, winner: null });
           }
 
           this.isLoading = false;
@@ -120,11 +115,7 @@ export class GameComponent {
 
   // 👉 Reiniciar el juego
   restartGame() {
-    this.rounds = [
-      { player1Move: null, player2Move: null, winner: null },
-      { player1Move: null, player2Move: null, winner: null },
-      { player1Move: null, player2Move: null, winner: null }
-    ];
+    this.rounds = [{ player1Move: null, player2Move: null, winner: null }];
     this.finalWinner = null;
   }
 
@@ -133,7 +124,7 @@ export class GameComponent {
     this.playersForm.reset();
     this.gameStarted = false;
     this.gameId = null;
-    this.rounds = [];
+    this.rounds = [{ player1Move: null, player2Move: null, winner: null }];
     this.finalWinner = null;
   }
 }
