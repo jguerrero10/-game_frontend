@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common'; 
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
+import { CommonModule} from '@angular/common'; 
+import { FormsModule } from '@angular/forms';
 import { GameService } from '../services/game.service';
 
 @Component({
@@ -8,7 +9,7 @@ import { GameService } from '../services/game.service';
   selector: 'app-game',
   templateUrl: './game.component.html',
   styleUrls: ['./game.component.css'],
-  imports: [ReactiveFormsModule, CommonModule]
+  imports: [ReactiveFormsModule, CommonModule, FormsModule]
 })
 export class GameComponent {
   playersForm: FormGroup;
@@ -38,59 +39,50 @@ export class GameComponent {
   // 👉 Registrar Jugadores
   registerPlayers() {
     if (this.playersForm.valid) {
-        const { player1, player2 } = this.playersForm.value;
+      const { player1, player2 } = this.playersForm.value;
 
-        // Registrar Jugador 1
-        this.gameService.registerPlayer(player1).subscribe({
-            next: (player1Response) => {
-                const player1Id = player1Response.id;
+      this.gameService.registerPlayer(player1).subscribe({
+        next: (player1Response) => {
+          const player1Id = player1Response.id;
 
-                // Registrar Jugador 2
-                this.gameService.registerPlayer(player2).subscribe({
-                    next: (player2Response) => {
-                        const player2Id = player2Response.id;
+          this.gameService.registerPlayer(player2).subscribe({
+            next: (player2Response) => {
+              const player2Id = player2Response.id;
 
-                        // Crear el juego con los IDs de los jugadores
-                        this.gameService.createGame(player1Id, player2Id).subscribe({
-                            next: (gameResponse) => {
-                                this.gameId = gameResponse.id;
-                                this.gameStarted = true;
-                                this.rounds = [
-                                    { player1Move: null, player2Move: null, winner: null },
-                                    { player1Move: null, player2Move: null, winner: null },
-                                    { player1Move: null, player2Move: null, winner: null }
-                                ];
-                            },
-                            error: (err) => console.error('❌ Error al crear el juego:', err)
-                        });
-                    },
-                    error: (err) => console.error('❌ Error al registrar Jugador 2:', err)
-                });
+              this.gameService.createGame(player1Id, player2Id).subscribe({
+                next: (gameResponse) => {
+                  this.gameId = gameResponse.id;
+                  this.gameStarted = true;
+                  this.rounds = [
+                    { player1Move: null, player2Move: null, winner: null },
+                    { player1Move: null, player2Move: null, winner: null },
+                    { player1Move: null, player2Move: null, winner: null }
+                  ];
+                },
+                error: (err) => console.error('❌ Error al crear el juego:', err)
+              });
             },
-            error: (err) => console.error('❌ Error al registrar Jugador 1:', err)
-        });
+            error: (err) => console.error('❌ Error al registrar Jugador 2:', err)
+          });
+        },
+        error: (err) => console.error('❌ Error al registrar Jugador 1:', err)
+      });
     } else {
-        console.error('❌ El formulario no es válido');
+      console.error('❌ El formulario no es válido');
     }
-}
+  }
 
-  setPlayer1Move(event: Event, index: number) {
-    const target = event.target as HTMLSelectElement;
-    this.rounds[index] = { ...this.rounds[index], player1Move: target.value };
+  setPlayer1Move(index: number) {
     this.checkRoundResult(index);
-}
+  }
 
-setPlayer2Move(event: Event, index: number) {
-    const target = event.target as HTMLSelectElement;
-
+  setPlayer2Move(index: number) {
     if (!this.rounds[index].player1Move) {
-        alert("⚠️ El Jugador 1 debe elegir su movimiento primero.");
-        return;
+      alert('⚠️ El Jugador 1 debe elegir su movimiento primero.');
+      return;
     }
-
-    this.rounds[index] = { ...this.rounds[index], player2Move: target.value };
     this.checkRoundResult(index);
-}
+  }
 
   // 👉 Comprobar el resultado de la ronda
   checkRoundResult(index: number) {
@@ -99,9 +91,9 @@ setPlayer2Move(event: Event, index: number) {
     if (round.player1Move && round.player2Move && this.gameId) {
       this.isLoading = true;
 
-      this.gameService.createRound({ 
-        gameId: this.gameId, 
-        player1Move: round.player1Move, 
+      this.gameService.createRound({
+        gameId: this.gameId,
+        player1Move: round.player1Move,
         player2Move: round.player2Move
       }).subscribe({
         next: (response: any) => {

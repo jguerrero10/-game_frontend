@@ -32,23 +32,23 @@
                 <div class="col-md-6">
                     <p class="text-primary"><strong>Jugador 1:</strong> {{ player1 }}</p>
                     <select 
-                        [value]="round.player1Move"
-                        (change)="setPlayer1Move($event, i)"
+                        [(ngModel)]="round.player1Move"
+                        (change)="setPlayer1Move(i)"  
                         class="form-select border-primary"
                     >
-                    <option *ngFor="let move of moves" [value]="move.value">{{ move.label }}</option>
+                        <option *ngFor="let move of moves" [value]="move.value">{{ move.label }}</option>
                     </select>
                 </div>
 
                 <div class="col-md-6">
                     <p class="text-success"><strong>Jugador 2:</strong> {{ player2 }}</p>
                     <select 
-                        [value]="round.player2Move"
-                        (change)="setPlayer2Move($event, i)"
+                        [(ngModel)]="round.player2Move" 
+                        (change)="setPlayer2Move(i)"   
                         [disabled]="!round.player1Move"
                         class="form-select border-success"
                     >
-                    <option *ngFor="let move of moves" [value]="move.value">{{ move.label }}</option>
+                        <option *ngFor="let move of moves" [value]="move.value">{{ move.label }}</option>
                     </select>
                 </div>
             </div>
