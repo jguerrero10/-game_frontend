@@ -1,68 +1,70 @@
 <div class="container mt-5">
     <h1 class="text-center text-primary mb-4">Piedra, Papel o Tijera Games</h1>
-  
+
     <!-- Registro de Jugadores -->
     <div class="card shadow-sm p-4 mt-4">
-      <h2 class="mb-3">Registro de Jugadores</h2>
-      <form [formGroup]="playersForm" (ngSubmit)="registerPlayers()" class="row g-3 align-items-end">
-        <div class="col-md-5">
-          <label for="player1" class="form-label">Jugador 1</label>
-          <input formControlName="player1" placeholder="Nombre Completo" class="form-control">
-        </div>
-  
-        <div class="col-md-5">
-          <label for="player2" class="form-label">Jugador 2</label>
-          <input formControlName="player2" placeholder="Nombre Completo" class="form-control">
-        </div>
-  
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-primary w-100 mt-3">Iniciar Batalla</button>
-        </div>
-      </form>
+        <h2 class="mb-3">Registro de Jugadores</h2>
+        <form [formGroup]="playersForm" (ngSubmit)="registerPlayers()" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label for="player1" class="form-label">Jugador 1</label>
+                <input formControlName="player1" placeholder="Nombre Completo" class="form-control" id="player1">
+            </div>
+
+            <div class="col-md-5">
+                <label for="player2" class="form-label">Jugador 2</label>
+                <input formControlName="player2" placeholder="Nombre Completo" class="form-control" id="player2">
+            </div>
+
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100 mt-3">Iniciar Batalla</button>
+            </div>
+        </form>
     </div>
-  
+
     <!-- Rondas del Juego -->
-    <div *ngIf="gameStarted" class="mt-4">
-      <h2 class="text-center text-secondary">Rondas</h2>
-  
-      <div *ngFor="let round of rounds; let i = index" class="card mt-3 p-3">
-        <h3>Ronda {{ i + 1 }}</h3>
-  
-        <div class="row">
-          <div class="col-md-6">
-            <p><strong>Jugador 1:</strong> {{ player1 }}</p>
-            <label for="player1Move{{i}}" class="form-label">Movimiento:</label>
-            <select id="player1Move{{i}}" (change)="setPlayer1Move($event, i)" class="form-select">
-              <option *ngFor="let move of moves" [value]="move">{{ move }}</option>
-            </select>
-          </div>
-  
-          <div class="col-md-6">
-            <p><strong>Jugador 2:</strong> {{ player2 }}</p>
-            <label for="player2Move{{i}}" class="form-label">Movimiento:</label>
-            <select id="player2Move{{i}}" (change)="setPlayer2Move($event, i)" 
-                    [disabled]="!round.player1Move" 
-                    class="form-select">
-              <option *ngFor="let move of moves" [value]="move">{{ move }}</option>
-            </select>
-          </div>
+    <div *ngIf="gameStarted" class="mt-5">
+        <h2 class="text-center text-secondary">Rondas</h2>
+
+        <div *ngFor="let round of rounds; let i = index" class="card mt-3 shadow-sm p-3">
+            <h3 class="text-center text-info">Ronda {{ i + 1 }}</h3>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="text-primary"><strong>Jugador 1:</strong> {{ player1 }}</p>
+                    <select 
+                        [value]="round.player1Move"
+                        (change)="setPlayer1Move($event, i)"
+                        class="form-select border-primary"
+                    >
+                    <option *ngFor="let move of moves" [value]="move.value">{{ move.label }}</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <p class="text-success"><strong>Jugador 2:</strong> {{ player2 }}</p>
+                    <select 
+                        [value]="round.player2Move"
+                        (change)="setPlayer2Move($event, i)"
+                        [disabled]="!round.player1Move"
+                        class="form-select border-success"
+                    >
+                    <option *ngFor="let move of moves" [value]="move.value">{{ move.label }}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div *ngIf="round.winner" class="alert alert-info mt-3">
+                <h4>Resultado de la Ronda: {{ round.winner }}</h4>
+            </div>
         </div>
-  
-        <!-- Resultado parcial -->
-        <div *ngIf="round.winner" class="alert alert-info mt-3">
-          <h4>Resultado de la Ronda: {{ round.winner }}</h4>
+
+        <!-- Resultado Final -->
+        <div *ngIf="finalWinner" class="alert alert-success mt-4 text-center">
+            <h2 class="fw-bold">🎯 ¡Tenemos un Ganador! 🎯</h2>
+            <p class="fw-bold">🏆 El ganador es: {{ finalWinner }}</p>
+
+            <button (click)="restartGame()" class="btn btn-primary">🔄 Reiniciar Juego</button>
+            <button (click)="newGame()" class="btn btn-warning">🆕 Nuevo Juego</button>
         </div>
-      </div>
-  
-      <!-- Resultado Final -->
-      <div *ngIf="finalWinner" class="alert alert-success mt-4 text-center">
-        <h2>¡Tenemos un Ganador!</h2>
-        <p class="fw-bold">El ganador es: {{ finalWinner }}</p>
-  
-        <button (click)="restartGame()" class="btn btn-primary">
-          Nuevo Juego
-        </button>
-      </div>
     </div>
-  </div>
-  
+</div>

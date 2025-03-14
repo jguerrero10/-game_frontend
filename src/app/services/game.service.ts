@@ -1,40 +1,48 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
-interface Player { id?: number; name: string; }
-interface Game { id: number; player_1: Player; player_2: Player; is_finished: boolean; winner?: Player | null; }
-interface Round { id?: number; game: number; player_1_move: string; player_2_move: string; winner: Player | null; }
+interface Player {
+  player1: string;
+  player2: string;
+}
 
-@Injectable({ providedIn: 'root' })
+interface Round {
+  gameId: number;
+  player1Move: string;
+  player2Move: string;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
 export class GameService {
-  private baseUrl = 'http://localhost:8000/api';
+  private apiUrl = 'http://localhost:8000/api';
 
   constructor(private http: HttpClient) {}
 
-  registerPlayer(playerData: Player): Observable<Player> {
-    return this.http.post<Player>(`${this.baseUrl}/players/`, playerData)
-      .pipe(catchError(this.handleError));
-  }
+  // Registrar jugadores
+  registerPlayer(playerName: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/players/`, { name: playerName });
+}
 
-  createGame(gameData: { player_1: number; player_2: number }): Observable<Game> {
-    return this.http.post<Game>(`${this.baseUrl}/games/`, gameData)
-      .pipe(catchError(this.handleError));
-  }
+createGame(player1Id: number, player2Id: number): Observable<any> {
+  return this.http.post(`${this.apiUrl}/games/`, {
+      player_1: player1Id,
+      player_2: player2Id
+  });
+}
+  // Crear una nueva ronda
+  createRound(roundData: Round): Observable<any> {
+    return this.http.post(`${this.apiUrl}/rounds/`, {
+        game: roundData.gameId,
+        player_1_move: roundData.player1Move,
+        player_2_move: roundData.player2Move
+    });
+}
 
-  createRound(roundData: Round): Observable<Round> {
-    return this.http.post<Round>(`${this.baseUrl}/rounds/`, roundData)
-      .pipe(catchError(this.handleError));
-  }
-
-  getGameStatus(gameId: number): Observable<Game> {
-    return this.http.get<Game>(`${this.baseUrl}/games/${gameId}/`)
-      .pipe(catchError(this.handleError));
-  }
-
-  private handleError(error: HttpErrorResponse) {
-    console.error('Error en la API:', error);
-    return throwError(() => new Error('Error en la comunicación con el servidor.'));
+  // Obtener el estado del juego
+  getGameStatus(gameId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/games/${gameId}/`);
   }
 }
