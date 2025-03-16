@@ -1,6 +1,21 @@
 <div class="container mt-5">
     <h1 class="text-center text-primary mb-4">Piedra, Papel o Tijera Games</h1>
 
+    <!-- TOP 5 JUGADORES GANADORES -->
+    <div class="card shadow-sm p-4 mt-4">
+        <h2 class="mb-3 text-center text-success">🏆 Top 5 Ganadores 🏆</h2>
+
+        <ul class="list-group">
+            <li 
+                *ngFor="let winner of topWinners; let i = index" 
+                class="list-group-item d-flex justify-content-between align-items-center"
+            >
+                <span>{{ i + 1 }}. {{ winner.name }}</span>
+                <span class="badge bg-success rounded-pill">{{ winner.total_wins }} victorias</span>
+            </li>
+        </ul>
+    </div>
+
     <!-- Registro de Jugadores -->
     <div class="card shadow-sm p-4 mt-4">
         <h2 class="mb-3">Registro de Jugadores</h2>

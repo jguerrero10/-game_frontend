@@ -25,6 +25,9 @@ export class GameService {
   registerPlayer(playerName: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/players/`, { name: playerName });
 }
+  getTopWinners(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/players/top_winners/`);
+  }
 
 createGame(player1Id: number, player2Id: number): Observable<any> {
   return this.http.post(`${this.apiUrl}/games/`, {

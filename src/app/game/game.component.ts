@@ -17,6 +17,7 @@ export class GameComponent {
   gameId: number | null = null;
   rounds: any[] = [{ player1Move: null, player2Move: null, winner: null }];
   finalWinner: string | null = null;
+  topWinners: any[] = [];
   isLoading = false;
   moves = [
     { label: 'Piedra', value: 'rock' },
@@ -33,6 +34,17 @@ export class GameComponent {
     this.playersForm = this.fb.group({
       player1: ['', Validators.required],
       player2: ['', Validators.required]
+    });
+
+    // Obtener el Top 5 de ganadores al cargar el componente
+    this.loadTopWinners();
+  }
+
+  // 👉 Cargar el Top 5 de jugadores ganadores
+  loadTopWinners() {
+    this.gameService.getTopWinners().subscribe({
+      next: (winners) => this.topWinners = winners,
+      error: (err) => console.error('❌ Error al obtener el Top 5 de ganadores:', err)
     });
   }
 
@@ -96,17 +108,16 @@ export class GameComponent {
       }).subscribe({
         next: (response: any) => {
           if (response.message) {
-            // El juego ha terminado, mostrar el mensaje del ganador final
             this.finalWinner = response.message;
           } else {
-            // El juego no ha terminado, mostrar el ganador de la ronda
             this.rounds[index].winner = response.winner_name;
-            
-            // Agregar una nueva ronda solo si el juego no ha terminado
             this.rounds.push({ player1Move: null, player2Move: null, winner: null });
           }
 
           this.isLoading = false;
+
+          // Recargar el Top 5 al finalizar el juego
+          this.loadTopWinners();
         },
         error: (err: any) => {
           console.error('❌ Error al procesar la ronda:', err);
@@ -114,85 +125,73 @@ export class GameComponent {
         }
       });
     }
-}
+  }
 
-// 👉 Reiniciar el juego
-restartGame() {
-  this.gameId = null;
+  // 👉 Reiniciar el juego
+  restartGame() {
+    this.gameId = null;
 
-  const { player1, player2 } = this.playersForm.value;
+    const { player1, player2 } = this.playersForm.value;
 
-  this.gameService.registerPlayer(`${player1}`).subscribe({
+    this.gameService.registerPlayer(`${player1}`).subscribe({
       next: (player1Response) => {
-          const player1Id = player1Response.id;
+        const player1Id = player1Response.id;
 
-          this.gameService.registerPlayer(`${player2}`).subscribe({
-              next: (player2Response) => {
-                  const player2Id = player2Response.id;
+        this.gameService.registerPlayer(`${player2}`).subscribe({
+          next: (player2Response) => {
+            const player2Id = player2Response.id;
 
-                  this.gameService.createGame(player1Id, player2Id).subscribe({
-                      next: (gameResponse) => {
-                          this.gameId = gameResponse.id;
+            this.gameService.createGame(player1Id, player2Id).subscribe({
+              next: (gameResponse) => {
+                this.gameId = gameResponse.id;
+                this.gameStarted = true;
+                this.rounds = [{ player1Move: null, player2Move: null, winner: null }];
+                this.finalWinner = null;
 
-                          this.gameStarted = true;
-
-                          this.rounds = [
-                              { player1Move: null, player2Move: null, winner: null }
-                          ];
-
-                          this.finalWinner = null;
-                      },
-                      error: (err) => {
-                          console.error('❌ Error al crear el nuevo juego:', err);
-                          alert('❌ Error al crear el nuevo juego.');
-                      }
-                  });
+                // Recargar el Top 5 después de reiniciar el juego
+                this.loadTopWinners();
               },
-              error: (err) => console.error('❌ Error al registrar Jugador 2:', err)
-          });
+              error: (err) => console.error('❌ Error al crear el nuevo juego:', err)
+            });
+          },
+          error: (err) => console.error('❌ Error al registrar Jugador 2:', err)
+        });
       },
       error: (err) => console.error('❌ Error al registrar Jugador 1:', err)
-  });
-}
+    });
+  }
 
   // 👉 Iniciar un juego nuevo
-newGame() {
-  this.gameId = null;
+  newGame() {
+    this.gameId = null;
 
-  const { player1, player2 } = this.playersForm.value;
+    const { player1, player2 } = this.playersForm.value;
 
-  this.gameService.registerPlayer(`${player1} (Nuevo)`).subscribe({
+    this.gameService.registerPlayer(`${player1} (Nuevo)`).subscribe({
       next: (player1Response) => {
-          const player1Id = player1Response.id;
+        const player1Id = player1Response.id;
 
-          this.gameService.registerPlayer(`${player2} (Nuevo)`).subscribe({
-              next: (player2Response) => {
-                  const player2Id = player2Response.id;
+        this.gameService.registerPlayer(`${player2} (Nuevo)`).subscribe({
+          next: (player2Response) => {
+            const player2Id = player2Response.id;
 
-                  this.gameService.createGame(player1Id, player2Id).subscribe({
-                      next: (gameResponse) => {
-                          this.gameId = gameResponse.id;
-                          this.gameStarted = true;
+            this.gameService.createGame(player1Id, player2Id).subscribe({
+              next: (gameResponse) => {
+                this.gameId = gameResponse.id;
+                this.gameStarted = true;
+                this.rounds = [{ player1Move: null, player2Move: null, winner: null }];
+                this.finalWinner = null;
 
-                          // Mostrar solo una ronda inicial (el backend controla cuándo termina)
-                          this.rounds = [
-                              { player1Move: null, player2Move: null, winner: null }
-                          ];
-
-                          this.finalWinner = null;
-                      },
-                      error: (err) => {
-                          console.error('❌ Error al crear el nuevo juego:', err);
-                          alert('❌ Error al crear el nuevo juego.');
-                      }
-                  });
+                // Recargar el Top 5 después de crear un nuevo juego
+                this.loadTopWinners();
               },
-              error: (err) => console.error('❌ Error al registrar Jugador 2:', err)
-          });
+              error: (err) => console.error('❌ Error al crear el nuevo juego:', err)
+            });
+          },
+          error: (err) => console.error('❌ Error al registrar Jugador 2:', err)
+        });
       },
       error: (err) => console.error('❌ Error al registrar Jugador 1:', err)
-  });
-}
-
-
+    });
+  }
 }
