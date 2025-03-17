@@ -10,7 +10,8 @@ steps:
       'run', 'deploy', 'angular-game-app',
       '--image', 'gcr.io/$PROJECT_ID/angular-game-app',
       '--platform', 'managed',
-      '--region', 'us-central1'
+      '--region', 'us-central1',
+      '--allow-unauthenticated'      
     ]
 images:
   - 'gcr.io/$PROJECT_ID/angular-game-app'
