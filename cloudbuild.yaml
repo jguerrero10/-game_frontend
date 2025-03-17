@@ -10,8 +10,7 @@ steps:
       'run', 'deploy', 'angular-game-app',
       '--image', 'gcr.io/$PROJECT_ID/angular-game-app',
       '--platform', 'managed',
-      '--region', 'us-central1',
-      '--set-env-vars', 'PORT=8080'
+      '--region', 'us-central1'
     ]
 images:
   - 'gcr.io/$PROJECT_ID/angular-game-app'
