@@ -17,7 +17,7 @@ interface Round {
   providedIn: 'root'
 })
 export class GameService {
-  private apiUrl = 'http://localhost:8000/api';
+  private apiUrl = 'https://django-app-480488096814.us-central1.run.app/api';
 
   constructor(private http: HttpClient) {}
 
